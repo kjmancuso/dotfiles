@@ -1,26 +1,20 @@
 #!/usr/bin/env python3
 import urllib.request
 import os
-try:
-    from retrying import retry
-except ImportError as e:
-    print(e)
-    exit(1)
 
-city = '78261'
+zip = '78261'
 units = 'Imperial'
 unit_key = 'F'
 
-@retry(wait_fixed=10000)
-def get_weather(city, units, unit_key):
+def get_weather(zip, units, unit_key):
     try:
-        api_key = {{ index (index (lastpass "openweathermap.org") 0).note "" }}
+        api_key = '{{ (index (lastpass "APIs/api.openweathermap.org") 0).password }}'
         api_url = 'http://api.openweathermap.org/data/2.5/weather'
-        weather = eval(str(urllib.request.urlopen("{}?q={}&APPID={}&units={}".format(api_url, city, api_key, units)).read())[2:-1])
+        weather = eval(str(urllib.request.urlopen("{}?zip={}&APPID={}&units={}".format(api_url, zip, api_key, units)).read())[2:-1])
         temp = int(float(weather['main']['temp']))
         print("{}°{}".format(temp, unit_key))
 
     except KeyError:
         print('No OPENWEATHER_API_KEY env var found')
 
-get_weather(city, units, unit_key)
+get_weather(zip, units, unit_key)
